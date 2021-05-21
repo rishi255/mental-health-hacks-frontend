@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'globals.dart' as globals;
 
 void main() => runApp(new MyApp());
 
@@ -11,7 +12,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.deepOrange,
       ),
       debugShowCheckedModeBanner: false,
-      home: new HomePageDialogflow(title: '',),
+      home: new HomePageDialogflow(
+        title: '',
+      ),
     );
   }
 }
@@ -65,10 +68,7 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
     //     Dialogflow(authGoogle: authGoogle, language: Language.english);
     // AIResponse response = await dialogflow.detectIntent(query);
     ChatMessage message = new ChatMessage(
-      text: 
-      // response.getMessage() ??
-          // new CardDialogflow(response.getListMessage()[0]).title,
-          "Hi! Here's a response.",
+      text: globals.user_history.join('\n'),
       name: "Bot",
       type: false,
     );
@@ -79,6 +79,7 @@ class _HomePageDialogflow extends State<HomePageDialogflow> {
 
   void _handleSubmitted(String text) {
     _textController.clear();
+    globals.user_history.add(text);
     ChatMessage message = new ChatMessage(
       text: text,
       name: "Me",
