@@ -7,28 +7,113 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'Example Dialogflow Flutter',
+      title: 'MLH Hacks App!',
       theme: new ThemeData(
-        primarySwatch: Colors.deepOrange,
+        primarySwatch: Colors.cyan,
       ),
       debugShowCheckedModeBanner: false,
-      home: new HomePageDialogflow(
-        title: '',
+      home: new HomePage(
+        title: 'Home Page!',
       ),
     );
   }
 }
 
-class HomePageDialogflow extends StatefulWidget {
-  HomePageDialogflow({Key? key, required this.title}) : super(key: key);
+class HomePage extends StatefulWidget {
+  HomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _HomePageDialogflow createState() => new _HomePageDialogflow();
+  _HomePage createState() => new _HomePage();
 }
 
-class _HomePageDialogflow extends State<HomePageDialogflow> {
+class _HomePage extends State<HomePage> {
+  Widget getButtons(BuildContext context, int i) {
+    // return <Widget>[
+    if (i == 0)
+      return new ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                          title: '',
+                        )));
+          },
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.audiotrack_outlined),
+              Text("Voice call! (or something)", textAlign: TextAlign.center)
+            ],
+          ));
+    else
+      return new ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatPage(
+                          title: '',
+                        )));
+          },
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.chat),
+              Text(" Chat with someone!", textAlign: TextAlign.center)
+            ],
+          ));
+    // ];
+  }
+
+  Widget _buildButtonsComposer() {
+    return new IconTheme(
+        data: new IconThemeData(color: Theme.of(context).accentColor),
+        child: new ListView.separated(
+          separatorBuilder: (BuildContext context, int index) {
+            return SizedBox(
+              height: 20,
+            );
+          },
+          itemCount: 2,
+          itemBuilder: (BuildContext ctx, int i) {
+            return Card(child: getButtons(ctx, i));
+          },
+          shrinkWrap: true,
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      appBar: new AppBar(
+        centerTitle: true,
+        title: new Text("Home Page"),
+      ),
+      body: new Column(
+        children: <Widget>[
+          new Container(
+            // decoration: new BoxDecoration(color: Theme.of(context).cardColor),
+            child: _buildButtonsComposer(),
+          )
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+      ),
+    );
+  }
+}
+
+class ChatPage extends StatefulWidget {
+  ChatPage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _ChatPage createState() => new _ChatPage();
+}
+
+class _ChatPage extends State<ChatPage> {
   final List<ChatMessage> _messages = <ChatMessage>[];
   final TextEditingController _textController = new TextEditingController();
 
