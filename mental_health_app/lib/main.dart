@@ -1,8 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'globals.dart' as globals;
 
 void main() => runApp(new MyApp());
 
+Future<String> fetchid() async{
+  final response =
+      await http.get(Uri.parse('https://mlh-service-3u5itkrgba-uc.a.run.app/init'));
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    print(response.body);
+    return response.body;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+}
+Future<String> fetchmsg(id,msg) async{
+  final response =
+      await http.get(Uri.parse('https://mlh-service-3u5itkrgba-uc.a.run.app/bot?id='+id+"msg="+msg));
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    print(response.body);
+    return response.body;
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+}
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -47,9 +76,10 @@ class _HomePage extends State<HomePage> {
               Text("Voice call! (or something)", textAlign: TextAlign.center)
             ],
           ));
-    else
+    else {
       return new ElevatedButton(
           onPressed: () {
+            globals.session=fetchid();
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -63,7 +93,8 @@ class _HomePage extends State<HomePage> {
               Text(" Chat with someone!", textAlign: TextAlign.center)
             ],
           ));
-    // ];
+      // ];
+    }
   }
 
   Widget _buildButtonsComposer() {
@@ -152,13 +183,15 @@ class _ChatPage extends State<ChatPage> {
     // Dialogflow dialogflow =
     //     Dialogflow(authGoogle: authGoogle, language: Language.english);
     // AIResponse response = await dialogflow.detectIntent(query);
-    ChatMessage message = new ChatMessage(
-      text: globals.user_history.join('\n'),
-      name: "Bot",
-      type: false,
-    );
-    setState(() {
-      _messages.insert(0, message);
+    fetchmsg(globals.session,globals.user_history.last).then((String result){
+      ChatMessage message = new ChatMessage(
+        text: result,
+        name: "Bot",
+        type: false,
+      );
+      setState(() {
+        _messages.insert(0, message);
+      });
     });
   }
 
