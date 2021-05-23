@@ -4,34 +4,40 @@ import 'globals.dart' as globals;
 
 void main() => runApp(new MyApp());
 
-Future<String> fetchid() async{
-  final response =
-      await http.get(Uri.parse('https://mlh-service-3u5itkrgba-uc.a.run.app/init'));
+Future<String> fetchid() async {
+  final response = await http.get(Uri.parse(globals.base_url + 'init'));
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
-    print(response.body);
+    print("Response session ID: " + response.body);
     return response.body;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
+    print("Didn't receive a 200 code! Response code: " +
+        response.statusCode.toString());
     throw Exception('Failed to load album');
   }
 }
-Future<String> fetchmsg(id,msg) async{
-  final response =
-      await http.get(Uri.parse('https://mlh-service-3u5itkrgba-uc.a.run.app/bot?id='+id+"msg="+msg));
+
+Future<String> fetchmsg(id, msg) async {
+  var parsed = Uri.parse(globals.base_url + 'bot?id=' + id + '&msg=' + msg);
+  print("Parsed: " + parsed.toString());
+  final response = await http.get(parsed);
   if (response.statusCode == 200) {
     // If the server did return a 200 OK response,
     // then parse the JSON.
-    print(response.body);
+    print("Received response: " + response.body);
     return response.body;
   } else {
     // If the server did not return a 200 OK response,
     // then throw an exception.
+    print("Didn't receive a 200 code! Response code: " +
+        response.statusCode.toString());
     throw Exception('Failed to load album');
   }
 }
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -61,36 +67,26 @@ class _HomePage extends State<HomePage> {
   Widget getButtons(BuildContext context, int i) {
     // return <Widget>[
     if (i == 0)
-      return new ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                          title: '',
-                        )));
-          },
-          child: Row(
-            children: <Widget>[
-              Icon(Icons.audiotrack_outlined),
-              Text("Voice call! (or something)", textAlign: TextAlign.center)
-            ],
-          ));
+      return new Text("Hi! My name is " +
+          globals.bot_name +
+          ", your friendly Pysch bot. Click below to get started.");
     else {
       return new ElevatedButton(
           onPressed: () {
-            globals.session=fetchid();
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                          title: '',
-                        )));
+            fetchid().then((String some_id) {
+              globals.session = some_id;
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChatPage(
+                            title: '',
+                          )));
+            });
           },
           child: Row(
             children: <Widget>[
               Icon(Icons.chat),
-              Text(" Chat with someone!", textAlign: TextAlign.center)
+              Text(" Get Started!", textAlign: TextAlign.center)
             ],
           ));
       // ];
@@ -183,10 +179,10 @@ class _ChatPage extends State<ChatPage> {
     // Dialogflow dialogflow =
     //     Dialogflow(authGoogle: authGoogle, language: Language.english);
     // AIResponse response = await dialogflow.detectIntent(query);
-    fetchmsg(globals.session,globals.user_history.last).then((String result){
+    fetchmsg(globals.session, globals.user_history.last).then((String result) {
       ChatMessage message = new ChatMessage(
         text: result,
-        name: "Bot",
+        name: globals.bot_name,
         type: false,
       );
       setState(() {
